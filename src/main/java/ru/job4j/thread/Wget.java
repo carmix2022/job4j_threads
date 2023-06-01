@@ -23,29 +23,26 @@ public class Wget implements Runnable {
                      this.url.substring(this.url.lastIndexOf('/') + 1)
              )
         ) {
-
             int bytesRead;
             int downloadedBytesCount = 0;
-            long delayInDownloadTime;
             byte[] dataBuffer = new byte[1024];
             long startTime = System.currentTimeMillis();
             while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
                 fileOutputStream.write(dataBuffer, 0, bytesRead);
-                delayInDownloadTime = 0;
+                long downloadTime = System.currentTimeMillis() - startTime;
                 downloadedBytesCount += bytesRead;
-                if (downloadedBytesCount >= this.speed) {
-                    long finishTime = System.currentTimeMillis();
-                    delayInDownloadTime = (long) (downloadedBytesCount * 1.0 / this.speed) - (finishTime - startTime);
-                    downloadedBytesCount = 0;
-                    startTime = System.currentTimeMillis();
+                if (downloadedBytesCount > this.speed * downloadTime) {
+                        Thread.sleep((long) (downloadedBytesCount * 1.0 / this.speed) - downloadTime);
                 }
-                Thread.sleep(delayInDownloadTime);
+                downloadedBytesCount = 0;
+                startTime = System.currentTimeMillis();
             }
         } catch (IOException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
+
     }
 
     private static void validArgs(String[] args) {
