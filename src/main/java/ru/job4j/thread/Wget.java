@@ -19,21 +19,27 @@ public class Wget implements Runnable {
     @Override
     public void run() {
         try (BufferedInputStream in = new BufferedInputStream(new URL(this.url).openStream());
-             FileOutputStream fileOutputStream = new FileOutputStream("pom_tmp.xml")) {
-            byte[] dataBuffer = new byte[1024];
+             FileOutputStream fileOutputStream = new FileOutputStream(
+                     this.url.substring(this.url.lastIndexOf('/') + 1)
+             )
+        ) {
+
             int bytesRead;
-            long delayInDownloadTime = 0;
-            long oneKbDowloadTimeInFact;
-            long oneKbDowloadTimeLimit = (long) 1024.0 / this.speed;
-            long start = System.currentTimeMillis();
+            int downloadedBytesCount = 0;
+            long delayInDownloadTime;
+            byte[] dataBuffer = new byte[1024];
+            long startTime = System.currentTimeMillis();
             while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
                 fileOutputStream.write(dataBuffer, 0, bytesRead);
-                oneKbDowloadTimeInFact = System.currentTimeMillis() - start;
-                if (oneKbDowloadTimeInFact < oneKbDowloadTimeLimit) {
-                    delayInDownloadTime = oneKbDowloadTimeLimit - oneKbDowloadTimeInFact;
+                delayInDownloadTime = 0;
+                downloadedBytesCount += bytesRead;
+                if (downloadedBytesCount >= this.speed) {
+                    long finishTime = System.currentTimeMillis();
+                    delayInDownloadTime = (long) (downloadedBytesCount * 1.0 / this.speed) - (finishTime - startTime);
+                    downloadedBytesCount = 0;
+                    startTime = System.currentTimeMillis();
                 }
                 Thread.sleep(delayInDownloadTime);
-                start = System.currentTimeMillis();
             }
         } catch (IOException e) {
             e.printStackTrace();
