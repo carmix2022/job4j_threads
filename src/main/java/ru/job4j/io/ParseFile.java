@@ -10,17 +10,15 @@ public final class ParseFile {
         this.file = file;
     }
 
-    public String getContent(Predicate<Integer> filter) throws IOException {
-        String output;
-        try (InputStream i = new FileInputStream(file)) {
-            output = "";
-            int data;
-            while ((data = i.read()) > 0) {
-                if (filter.test(data)) {
-                    output += (char) data;
+    public String getContent(Predicate<Character> filter) throws IOException {
+        StringBuilder output = new StringBuilder();
+        try (BufferedInputStream input = new BufferedInputStream(new FileInputStream(file))) {
+            for (byte readByte : input.readAllBytes()) {
+                if (filter.test((char) readByte)) {
+                    output.append((char) readByte);
                 }
             }
         }
-        return output;
+        return output.toString();
     }
 }
