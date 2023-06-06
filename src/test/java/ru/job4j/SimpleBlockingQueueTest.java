@@ -7,22 +7,30 @@ import static org.assertj.core.api.Assertions.*;
 
 class SimpleBlockingQueueTest {
 
-    private final SimpleBlockingQueue sbq = new SimpleBlockingQueue(5);
+    private final SimpleBlockingQueue<Integer> sbq = new SimpleBlockingQueue<>(5);
     private int countProducer = 0;
     private int countConsumer = 0;
-    private Thread producer = new Thread(
+    private final Thread producer = new Thread(
             () -> {
                 for (int i = 1; i < 7; i++) {
                     countProducer++;
-                    sbq.offer(i);
+                    try {
+                        sbq.offer(i);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
             }
     );
-    private Thread consumer = new Thread(
+    private final Thread consumer = new Thread(
             () -> {
                 for (int i = 1; i < 7; i++) {
                     countConsumer++;
-                    sbq.poll();
+                    try {
+                        sbq.poll();
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
             }
     );
