@@ -16,6 +16,10 @@ public class SimpleBlockingQueue<T> {
         this.queueMaxSize = queueMaxSize;
     }
 
+    public synchronized boolean isEmpty() {
+      return this.queue.isEmpty();
+    }
+
     public synchronized void offer(T value) throws InterruptedException {
         while (this.queue.size() >= this.queueMaxSize) {
             this.wait();
