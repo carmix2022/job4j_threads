@@ -9,7 +9,8 @@ public class CASCount {
     private final AtomicInteger count = new AtomicInteger();
 
     public void increment() {
-        int current, next;
+        int current;
+        int next;
         do {
             current = count.get();
             next = current + 1;
