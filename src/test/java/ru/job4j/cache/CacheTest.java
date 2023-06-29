@@ -48,14 +48,4 @@ class CacheTest {
         cache.delete(base2);
         assertThat(cache.get(1)).isNull();
     }
-
-    @Test
-    public void test5() {
-        Cache cache = new Cache();
-        Base base1 = new Base(1, 0);
-        cache.add(base1);
-        Base base2 = new Base(1, 1);
-        assertThatThrownBy(() -> cache.delete(base2)).isInstanceOf(OptimisticException.class);
-        assertThat(cache.get(1)).isEqualTo(base1);
-    }
 }
