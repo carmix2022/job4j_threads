@@ -5,15 +5,15 @@ import java.util.*;
 import java.util.stream.*;
 
 public class ThreadPool {
-    private final List<ThreadInPool> threads;
+    private final List<Thread> threads;
     private final SimpleBlockingQueue<Runnable> tasks = new SimpleBlockingQueue<>(10);
     private final int size = Runtime.getRuntime().availableProcessors();
 
     public ThreadPool() {
         threads = IntStream.range(0, size)
-                .mapToObj(i -> new ThreadInPool())
+                .mapToObj(i -> new Thread(new WorkInPool()))
                 .collect(Collectors.toCollection(LinkedList::new));
-        threads.forEach(ThreadInPool::run);
+        threads.forEach(Thread::start);
     }
 
     public void work(Runnable job) throws InterruptedException {
@@ -21,14 +21,14 @@ public class ThreadPool {
     }
 
     public void shutdown() {
-        for (ThreadInPool thread : threads) {
+        for (Thread thread : threads) {
             if (!thread.isInterrupted()) {
                 thread.interrupt();
             }
         }
     }
 
-    public class ThreadInPool extends Thread implements Runnable {
+    public class WorkInPool implements Runnable {
         @Override
         public void run() {
             try {
