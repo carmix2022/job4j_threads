@@ -11,7 +11,15 @@ public class ThreadPool {
 
     public ThreadPool() {
         threads = IntStream.range(0, size)
-                .mapToObj(i -> new Thread(new WorkInPool()))
+                .mapToObj(i -> new Thread(() -> {
+                    try {
+                        while (!Thread.currentThread().isInterrupted()) {
+                            tasks.poll();
+                        }
+                    } catch (Exception e) {
+                        Thread.currentThread().interrupt();
+                    }
+                }))
                 .collect(Collectors.toCollection(LinkedList::new));
         threads.forEach(Thread::start);
     }
@@ -28,16 +36,22 @@ public class ThreadPool {
         }
     }
 
-    public class WorkInPool implements Runnable {
-        @Override
-        public void run() {
-            try {
-                while (!Thread.currentThread().isInterrupted()) {
-                    tasks.poll();
-                }
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
+    public static void main(String[] args) {
+        ThreadPool tp = new ThreadPool();
+        try {
+            tp.work(() -> System.out.printf("Task execute in thread %s%n", Thread.currentThread().getName()));
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        try {
+            tp.work(() -> System.out.printf("Task execute in thread %s%n", Thread.currentThread().getName()));
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         }
     }
 }
