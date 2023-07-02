@@ -14,7 +14,7 @@ public class ThreadPool {
                 .mapToObj(i -> new Thread(() -> {
                     try {
                         while (!Thread.currentThread().isInterrupted()) {
-                            tasks.poll();
+                            tasks.poll().run();
                         }
                     } catch (Exception e) {
                         Thread.currentThread().interrupt();
@@ -39,17 +39,9 @@ public class ThreadPool {
     public static void main(String[] args) {
         ThreadPool tp = new ThreadPool();
         try {
-            tp.work(() -> System.out.printf("Task execute in thread %s%n", Thread.currentThread().getName()));
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-        try {
-            tp.work(() -> System.out.printf("Task execute in thread %s%n", Thread.currentThread().getName()));
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-        try {
-            Thread.sleep(2000);
+            for (int i = 0; i < 10; i++) {
+                tp.work(() -> System.out.printf("Task execute in thread %s%n", Thread.currentThread().getName()));
+            }
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
