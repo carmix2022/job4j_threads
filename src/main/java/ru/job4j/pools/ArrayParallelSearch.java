@@ -2,19 +2,20 @@ package ru.job4j.pools;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveAction;
+import java.util.concurrent.RecursiveTask;
 
 public class ArrayParallelSearch<T> extends RecursiveAction {
 
     private static final int THRESHOLD = 10;
+    private static int resultIndex;
     private final T[] array;
     private final T searchingObject;
-    private static final List<Integer> RESULT_INDEXES = new ArrayList<>();
     private final int from;
     private final int to;
 
     public ArrayParallelSearch(T[] array, T searchingObject, int from, int to) {
+        resultIndex = -1;
         this.array = array;
         this.searchingObject = searchingObject;
         this.from = from;
@@ -22,6 +23,7 @@ public class ArrayParallelSearch<T> extends RecursiveAction {
     }
 
     public ArrayParallelSearch(T[] array, T searchingObject) {
+        resultIndex = -1;
         this.array = array;
         this.searchingObject = searchingObject;
         this.from = 0;
@@ -30,28 +32,21 @@ public class ArrayParallelSearch<T> extends RecursiveAction {
 
     @Override
     protected void compute() {
-        if (this.array.length <= THRESHOLD) {
-            for (int i = 0; i < this.array.length; i++) {
-                if (this.searchingObject.equals(this.array[i])) {
-                    RESULT_INDEXES.add(i);
+        if (to - from < THRESHOLD) {
+            for (int i = from; i <= to; i++) {
+                if (searchingObject.equals(array[i])) {
+                    resultIndex = i;
                 }
             }
         } else {
-            if (this.from == this.to && this.array[from].equals(this.searchingObject)) {
-                RESULT_INDEXES.add(this.from);
-            }
-            if (this.from != this.to) {
-                int mid = (this.from + this.to) / 2;
-                invokeAll(new ArrayParallelSearch<T>(this.array, this.searchingObject, this.from, mid),
-                        new ArrayParallelSearch<T>(this.array, this.searchingObject, mid + 1, this.to));
-            }
+                int mid = (from + to) / 2;
+                invokeAll(new ArrayParallelSearch<>(array, searchingObject, from, mid),
+                        new ArrayParallelSearch<>(array, searchingObject, mid + 1, to));
         }
     }
 
-    public List<Integer> indexOf() {
+    public int indexOf() {
         this.invoke();
-        List<Integer> rsl = List.copyOf(RESULT_INDEXES);
-        RESULT_INDEXES.clear();
-        return rsl;
+        return resultIndex;
     }
 }
