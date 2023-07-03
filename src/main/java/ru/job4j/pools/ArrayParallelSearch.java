@@ -36,9 +36,10 @@ public class ArrayParallelSearch<T> extends RecursiveAction {
             for (int i = from; i <= to; i++) {
                 if (searchingObject.equals(array[i])) {
                     resultIndex = i;
+                    break;
                 }
             }
-        } else {
+        } else if (resultIndex == -1) {
                 int mid = (from + to) / 2;
                 invokeAll(new ArrayParallelSearch<>(array, searchingObject, from, mid),
                         new ArrayParallelSearch<>(array, searchingObject, mid + 1, to));
