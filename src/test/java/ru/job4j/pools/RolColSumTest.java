@@ -19,9 +19,13 @@ class RolColSumTest {
                 {1, 4, 3, 0},
                 {1, 4, 4, 4}
         };
-        String factResult = Arrays.toString(asyncSum(matrix));
-        String expectedResult = "[Sums{rowSum=1, colSum=4}, Sums{rowSum=3, colSum=10}, "
-                + "Sums{rowSum=8, colSum=7}, Sums{rowSum=13, colSum=4}]";
+        Sums[] factResult = asyncSum(matrix);
+        Sums[] expectedResult = {
+                new Sums(1, 4),
+                new Sums(3, 10),
+                new Sums(8, 7),
+                new Sums(13, 4)
+        };
         assertThat(factResult).isEqualTo(expectedResult);
     }
 
@@ -33,9 +37,13 @@ class RolColSumTest {
                 {1, 4, 3, 0},
                 {1, 4, 4, 4}
         };
-        String factResult = Arrays.toString(sum(matrix));
-        String expectedResult = "[Sums{rowSum=1, colSum=4}, Sums{rowSum=3, colSum=10}, "
-                + "Sums{rowSum=8, colSum=7}, Sums{rowSum=13, colSum=4}]";
+        Sums[] factResult = sum(matrix);
+        Sums[] expectedResult = {
+                new Sums(1, 4),
+                new Sums(3, 10),
+                new Sums(8, 7),
+                new Sums(13, 4)
+        };
         assertThat(factResult).isEqualTo(expectedResult);
     }
 

@@ -5,21 +5,6 @@ import java.util.concurrent.*;
 import java.util.stream.*;
 
 public class RolColSum {
-    public static class Sums {
-        private int rowSum;
-        private int colSum;
-
-        public Sums(int rowSum, int colSum) {
-            this.rowSum = rowSum;
-            this.colSum = colSum;
-        }
-
-        @Override
-        public String toString() {
-            return "Sums{" + "rowSum=" + rowSum + ", colSum=" + colSum + '}';
-        }
-    }
-
     public static Sums[] sum(int[][] matrix) {
         Sums[] rsl = new Sums[matrix.length];
         for (int i = 0; i < matrix.length; i++) {
