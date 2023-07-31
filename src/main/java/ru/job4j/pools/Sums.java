@@ -6,6 +6,14 @@ public class Sums {
     private int rowSum;
     private int colSum;
 
+    public void setRowSum(int rowSum) {
+        this.rowSum = rowSum;
+    }
+
+    public void setColSum(int colSum) {
+        this.colSum = colSum;
+    }
+
     public Sums(int rowSum, int colSum) {
         this.rowSum = rowSum;
         this.colSum = colSum;

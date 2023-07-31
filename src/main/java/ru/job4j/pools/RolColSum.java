@@ -16,29 +16,50 @@ public class RolColSum {
         }
         return rsl;
     }
+//
+//    public static Sums[] asyncSum(int[][] matrix) throws ExecutionException, InterruptedException {
+//        List<CompletableFuture<Integer[]>> rowColSumFutures = IntStream.range(0, matrix.length)
+//                .mapToObj(k -> getTask(matrix, k)).toList();
+//        CompletableFuture<List<Integer[]>> allFutures =
+//                CompletableFuture.allOf(rowColSumFutures.toArray(new CompletableFuture[0]))
+//                        .thenApply(v -> rowColSumFutures.stream()
+//                                .map(CompletableFuture::join)
+//                                .collect(Collectors.toList()));
+//        CompletableFuture<Sums[]> sumsArrayFuture = allFutures.thenApply(allSums ->
+//                allSums.stream()
+//                        .map(t -> new Sums(t[0], t[1]))
+//                        .toArray(Sums[]::new));
+//        return sumsArrayFuture.get();
+//
+//    }
+//
+//    private static CompletableFuture<Integer[]> getTask(int[][] matrix, int rowCol) {
+//        return CompletableFuture.supplyAsync(() -> {
+//            Integer[] rsl = new Integer[2];
+//            rsl[0] = Arrays.stream(matrix[rowCol]).sum();
+//            rsl[1] = Arrays.stream(matrix).mapToInt(ints -> ints[rowCol]).sum();
+//            return rsl;
+//        });
+//    }
 
     public static Sums[] asyncSum(int[][] matrix) throws ExecutionException, InterruptedException {
-        List<CompletableFuture<Integer[]>> rowColSumFutures = IntStream.range(0, matrix.length)
+        List<CompletableFuture<Sums>> rowColSumFutures = IntStream.range(0, matrix.length)
                 .mapToObj(k -> getTask(matrix, k)).toList();
-        CompletableFuture<List<Integer[]>> allFutures =
+        CompletableFuture<Sums[]> allFutures =
                 CompletableFuture.allOf(rowColSumFutures.toArray(new CompletableFuture[0]))
                         .thenApply(v -> rowColSumFutures.stream()
                                 .map(CompletableFuture::join)
-                                .collect(Collectors.toList()));
-        CompletableFuture<Sums[]> sumsArrayFuture = allFutures.thenApply(allSums ->
-                allSums.stream()
-                        .map(t -> new Sums(t[0], t[1]))
-                        .toArray(Sums[]::new));
-        return sumsArrayFuture.get();
+                                .toArray(Sums[]::new));
+        return allFutures.get();
 
     }
 
-    private static CompletableFuture<Integer[]> getTask(int[][] matrix, int rowCol) {
+    private static CompletableFuture<Sums> getTask(int[][] matrix, int rowCol) {
         return CompletableFuture.supplyAsync(() -> {
-            Integer[] rsl = new Integer[2];
-            rsl[0] = Arrays.stream(matrix[rowCol]).sum();
-            rsl[1] = Arrays.stream(matrix).mapToInt(ints -> ints[rowCol]).sum();
-            return rsl;
+            Sums sums = new Sums(0, 0);
+            sums.setRowSum(Arrays.stream(matrix[rowCol]).sum());
+            sums.setColSum(Arrays.stream(matrix).mapToInt(ints -> ints[rowCol]).sum());
+            return sums;
         });
     }
 }
